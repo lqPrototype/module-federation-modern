@@ -1,7 +1,5 @@
 # Module Federation Modern (Nx Monorepo)
 
-## 中文文档
-
 ### 1. 项目简介
 
 这是一个基于 **Nx + pnpm workspace** 的微前端示例仓库，使用 **Modern.js v3** 与 **Module Federation v2（Modern.js 插件）** 搭建双应用联动架构：
@@ -14,24 +12,7 @@
 - 组件级接入（Component-level Federation）
 - 整应用接入（App-level Federation）
 
-### 2. 架构总览
-
-```mermaid
-flowchart LR
-  H["host (port 8080)"]
-  R["remote-app (port 3053)"]
-
-  H -->|"remote/Image, remote/Button, remote/app"| R
-```
-
-关键 Federation 配置关系：
-
-- `host` remotes
-- `remote -> http://localhost:3053/static/mf-manifest.json`
-- `remote-app` exposes
-- `./Image`, `./Button`, `./app`
-
-### 3. 技术栈
+### 2. 技术栈
 
 - Monorepo：Nx `22.5.1`
 - 包管理：pnpm workspace
@@ -43,7 +24,7 @@ flowchart LR
 - 代码检查：Biome `1.9.4`
 - Node 版本要求：`>=20`
 
-### 4. 目录结构
+### 3. 目录结构
 
 ```text
 .
@@ -68,7 +49,7 @@ flowchart LR
     │           └── Button.tsx
 ```
 
-### 5. 本地启动
+### 4. 本地启动
 
 安装依赖：
 
@@ -87,7 +68,7 @@ pnpm nx run-many --target=serve --configuration=development -p host,remote-app
 - Host: [http://localhost:8080](http://localhost:8080)
 - Remote App: [http://localhost:3053](http://localhost:3053)
 
-### 6. 构建命令
+### 5. 构建命令
 
 ```bash
 pnpm nx run-many --target=build --configuration=development -p host,remote-app
@@ -99,7 +80,7 @@ pnpm nx run-many --target=build --configuration=development -p host,remote-app
 pnpm build
 ```
 
-### 7. 演示路径
+### 6. 演示路径
 
 在 Host（`http://localhost:8080`）中重点验证：
 
