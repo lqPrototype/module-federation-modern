@@ -1,8 +1,7 @@
 {
-  "name": "@org/source",
+  "name": "module-federation-modern",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
   "private": true,
   "dependencies": {},
   "devDependencies": {
@@ -11,9 +10,11 @@
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
     "nx": "22.5.1",
-    "prettier": "^2.6.2",
-    "tslib": "^2.3.0",
-    "typescript": "~5.9.2"
+    "prettier": "^2.6.2"
+  },
+  "scripts": {
+    "app": "nx run-many --target=serve --configuration=development -p host,remote-app",
+    "build": "nx run-many --target=build --configuration=development -p host,remote-app"
   },
   "workspaces": [
     "packages/*"

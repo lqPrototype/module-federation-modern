@@ -1,0 +1,131 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family:
+    PingFang SC,
+    Hiragino Sans GB,
+    Microsoft YaHei,
+    Arial,
+    sans-serif;
+  background: radial-gradient(circle at top, #f4f8ff 0%, #eef1f7 60%, #e8edf8 100%);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.host-shell {
+  min-height: 100vh;
+}
+
+.host-sider {
+  background: linear-gradient(180deg, #0d1d41 0%, #1b3470 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.host-brand {
+  padding: 18px 18px 8px;
+}
+
+.host-workspace-tag {
+  padding: 0 16px 12px;
+}
+
+.host-menu {
+  background: transparent !important;
+  border-right: none !important;
+}
+
+.host-header {
+  height: 72px !important;
+  line-height: normal !important;
+  padding: 0 22px !important;
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-bottom: 1px solid #d6def0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(8px);
+}
+
+.host-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.host-search {
+  width: 280px;
+}
+
+.host-content {
+  padding: 18px;
+}
+
+.route-stage {
+  border-radius: 14px;
+  border: 1px solid #dbe4f5;
+  background: linear-gradient(180deg, #fbfcff 0%, #f3f6fd 100%);
+  min-height: calc(100vh - 126px);
+  padding: 16px;
+}
+
+.hero-banner {
+  border-radius: 12px;
+  border: 1px solid #d9e1f6;
+  background: linear-gradient(130deg, #f9fbff 0%, #edf4ff 75%);
+}
+
+.kpi-card {
+  border-radius: 10px;
+  border: 1px solid #d9e2f4;
+  box-shadow: 0 6px 16px rgba(30, 55, 110, 0.08);
+}
+
+.module-card {
+  border-radius: 10px;
+  border: 1px solid #dce3f3;
+  height: 100%;
+}
+
+.integration-card {
+  border-radius: 10px;
+  border: 1px solid #d9e2f2;
+}
+
+.remote-preview {
+  border: 1px dashed #c8d4f2;
+  border-radius: 10px;
+  background: #fcfdff;
+  padding: 12px;
+}
+
+.remote-app-frame {
+  border: 1px solid #d7e2f4;
+  border-radius: 12px;
+  background: #ffffff;
+  min-height: 540px;
+  overflow: hidden;
+}
+
+@media (max-width: 992px) {
+  .host-header {
+    height: auto !important;
+    padding: 10px 12px !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .host-search {
+    width: 100%;
+  }
+
+  .route-stage {
+    min-height: calc(100vh - 156px);
+    padding: 12px;
+  }
+}
