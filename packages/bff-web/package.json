@@ -1,0 +1,22 @@
+{
+  "name": "bff-web",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "modern dev",
+    "build": "modern build",
+    "serve": "modern serve",
+    "lint": "biome check"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@modern-js/app-tools": "3.0.3",
+    "@modern-js/plugin-bff": "3.0.3",
+    "@modern-js/tsconfig": "3.0.3",
+    "@types/node": "^20",
+    "typescript": "~5.7.3"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "showcase-ssg",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/showcase-ssg/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "cd packages/showcase-ssg; pnpm run build",
+            "forwardAllArgs": true
+          }
+        ]
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "cd packages/showcase-ssg; pnpm run dev",
+            "forwardAllArgs": false
+          }
+        ]
+      }
+    }
+  }
+}

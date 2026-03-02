@@ -8,14 +8,38 @@ import {
 import { Outlet, useLocation, useNavigate } from '@modern-js/runtime/router';
 import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ensureAuthenticated } from '../utils/sso';
+import './index.css';
 
 const { Header, Sider, Content } = Layout;
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    let active = true;
+
+    const check = async () => {
+      const loggedIn = await ensureAuthenticated();
+      if (active && loggedIn) {
+        setAuthChecked(true);
+      }
+    };
+
+    check();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!authChecked) {
+    return <div className="p-6 text-slate-600">正在验证登录状态...</div>;
+  }
 
   const menuItems: MenuProps['items'] = [
     {

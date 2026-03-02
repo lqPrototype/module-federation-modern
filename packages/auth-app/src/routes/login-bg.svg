@@ -1,0 +1,73 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1920" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06142A"/>
+      <stop offset="0.46" stop-color="#10366A"/>
+      <stop offset="1" stop-color="#1B68D4"/>
+    </linearGradient>
+
+    <radialGradient id="haloA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1590 260) rotate(130) scale(620 520)">
+      <stop stop-color="#9FCCFF" stop-opacity="0.62"/>
+      <stop offset="1" stop-color="#9FCCFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="haloB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(480 1010) rotate(-6) scale(820 420)">
+      <stop stop-color="#65AAFF" stop-opacity="0.56"/>
+      <stop offset="1" stop-color="#65AAFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="meshLine" x1="280" y1="188" x2="1420" y2="840" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#CFE4FF" stop-opacity="0.44"/>
+      <stop offset="1" stop-color="#CFE4FF" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="wave" x1="320" y1="860" x2="1640" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9CCBFF" stop-opacity="0.46"/>
+      <stop offset="1" stop-color="#9CCBFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <filter id="softGlow" x="0" y="0" width="1920" height="1080" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#haloA)"/>
+  <rect width="1920" height="1080" fill="url(#haloB)"/>
+
+  <g opacity="0.24" stroke="#D7E8FF" stroke-width="1">
+    <path d="M170 164H1080"/>
+    <path d="M170 236H1200"/>
+    <path d="M170 308H1320"/>
+    <path d="M170 380H1440"/>
+    <path d="M170 452H1560"/>
+    <path d="M170 524H1680"/>
+  </g>
+
+  <g opacity="0.28" stroke="url(#meshLine)" stroke-width="2">
+    <path d="M250 880L690 600L930 690L1230 460L1510 540L1710 420"/>
+    <path d="M280 800L610 650L860 740L1160 560L1430 620L1650 510"/>
+  </g>
+
+  <g opacity="0.32" stroke="url(#wave)" stroke-width="2.5">
+    <path d="M220 930C430 860 620 760 760 650C870 565 960 470 1130 430C1320 385 1460 450 1710 360"/>
+    <path d="M200 1010C390 950 560 855 700 755C850 648 980 555 1190 540C1390 525 1540 600 1750 530"/>
+  </g>
+
+  <g fill="#E3F0FF" opacity="0.94">
+    <circle cx="690" cy="600" r="7"/>
+    <circle cx="930" cy="690" r="7"/>
+    <circle cx="1230" cy="460" r="7"/>
+    <circle cx="1510" cy="540" r="7"/>
+    <circle cx="1710" cy="420" r="7"/>
+    <circle cx="610" cy="650" r="7"/>
+    <circle cx="860" cy="740" r="7"/>
+    <circle cx="1160" cy="560" r="7"/>
+    <circle cx="1430" cy="620" r="7"/>
+    <circle cx="1650" cy="510" r="7"/>
+  </g>
+
+  <g opacity="0.2" filter="url(#softGlow)">
+    <ellipse cx="1490" cy="300" rx="280" ry="170" fill="#9FCCFF"/>
+    <ellipse cx="860" cy="930" rx="380" ry="210" fill="#5FA4FF"/>
+  </g>
+</svg>

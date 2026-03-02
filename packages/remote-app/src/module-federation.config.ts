@@ -2,6 +2,10 @@ import { createModuleFederationConfig } from '@module-federation/modern-js-v3';
 
 export default createModuleFederationConfig({
   name: 'remote',
+  // dts: false,
+  dev: {
+    // disableDynamicRemoteTypeHints: true,
+  },
   filename: 'static/remoteEntry.js',
   manifest: {
     filePath: 'static',
@@ -16,7 +20,15 @@ export default createModuleFederationConfig({
     './app': './src/export-app.tsx', // 导出整个应用
   },
   shared: {
-    react: { singleton: true },
-    'react-dom': { singleton: true }
+    react: {
+      singleton: true,
+      requiredVersion: false,
+      strictVersion: false,
+    },
+    'react-dom': {
+      singleton: true,
+      requiredVersion: false,
+      strictVersion: false,
+    }
   }
 });

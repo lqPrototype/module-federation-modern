@@ -1,0 +1,13 @@
+{
+  "extends": "@modern-js/tsconfig/base",
+  "compilerOptions": {
+    "declaration": false,
+    "baseUrl": "./",
+    "noCheck": true,
+    "paths": {
+      "@/*": ["./api/*"]
+    }
+  },
+  "include": ["api", "config", "modern.config.ts"],
+  "exclude": ["**/node_modules"]
+}

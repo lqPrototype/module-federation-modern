@@ -14,6 +14,7 @@ import {
 import type { MenuProps } from 'antd';
 import { lazyLoadComponentPlugin } from '@module-federation/modern-js-v3/react';
 import { getInstance } from '@module-federation/modern-js-v3/runtime';
+import { ensureAuthenticated } from '../utils/sso';
 import 'antd/dist/antd.css';
 import './index.css';
 
@@ -45,6 +46,28 @@ const menuLabelMap: Record<string, string> = {
 const App: React.FC = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [authChecked, setAuthChecked] = React.useState(false);
+
+  React.useEffect(() => {
+    let active = true;
+
+    const check = async () => {
+      const loggedIn = await ensureAuthenticated();
+      if (active && loggedIn) {
+        setAuthChecked(true);
+      }
+    };
+
+    check();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!authChecked) {
+    return <div className="p-6 text-slate-600">正在验证登录状态...</div>;
+  }
 
   let selectedKey = 'home';
   if (pathname.startsWith('/remote-app')) {

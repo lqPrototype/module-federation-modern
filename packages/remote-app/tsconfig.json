@@ -2,7 +2,7 @@
   "extends": "@modern-js/tsconfig/base",
   "compilerOptions": {
     "declaration": false,
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "jsx": "preserve",
     "baseUrl": "./",
     "noCheck": true,

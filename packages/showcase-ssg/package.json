@@ -1,0 +1,32 @@
+{
+  "name": "showcase-ssg",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "modern dev",
+    "build": "modern build",
+    "serve": "modern serve",
+    "lint": "biome check"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modern-js/runtime": "3.0.3",
+    "antd": "4.24.15",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@modern-js/app-tools": "3.0.3",
+    "@modern-js/plugin-ssg": "3.0.3",
+    "@modern-js/plugin-tailwindcss": "^2.70.4",
+    "@modern-js/tsconfig": "3.0.3",
+    "@types/node": "^20",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.7.3"
+  }
+}
