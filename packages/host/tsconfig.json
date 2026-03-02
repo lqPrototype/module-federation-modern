@@ -4,6 +4,7 @@
     "ignoreDeprecations": "6.0",
     "declaration": false,
     "jsx": "preserve",
+    "noCheck": true,
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],

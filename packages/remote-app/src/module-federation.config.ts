@@ -2,7 +2,7 @@ import { createModuleFederationConfig } from '@module-federation/modern-js-v3';
 
 export default createModuleFederationConfig({
   name: 'remote',
-  filename: 'remoteEntry.js',
+  filename: 'static/remoteEntry.js',
   manifest: {
     filePath: 'static',
   },
@@ -18,10 +18,5 @@ export default createModuleFederationConfig({
   shared: {
     react: { singleton: true },
     'react-dom': { singleton: true }
-  },
-  dts: {
-    generateTypes: {
-      compilerInstance: 'tspc',
-    },
-  },
+  }
 });

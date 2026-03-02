@@ -26,11 +26,13 @@ const menuItems: MenuProps['items'] = [
   { key: 'home', label: '总览工作台' },
   { key: 'remote', label: 'Remote 组件中心' },
   { key: 'remote-app', label: 'Remote 应用容器' },
+  { key: 'dy-remote-app', label: '动态Remote 组件中心' },
 ];
 
 const menuPathMap: Record<string, string> = {
   home: '/',
   remote: '/remote',
+  'dy-remote-app': '/dy-remote-app',
   'remote-app': '/remote-app',
 };
 
@@ -47,6 +49,8 @@ const App: React.FC = () => {
   let selectedKey = 'home';
   if (pathname.startsWith('/remote-app')) {
     selectedKey = 'remote-app';
+  } else if (pathname.startsWith('/dy-remote-app')) {
+    selectedKey = 'dy-remote-app';
   } else if (pathname.startsWith('/remote')) {
     selectedKey = 'remote';
   }
@@ -102,14 +106,7 @@ const App: React.FC = () => {
         </Header>
 
         <Content className="host-content">
-          <div className="route-stage">
-            <Breadcrumb style={{ marginBottom: 14 }}>
-              <Breadcrumb.Item>Host</Breadcrumb.Item>
-              <Breadcrumb.Item>Applications</Breadcrumb.Item>
-              <Breadcrumb.Item>{menuLabelMap[selectedKey]}</Breadcrumb.Item>
-            </Breadcrumb>
-            <Outlet />
-          </div>
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

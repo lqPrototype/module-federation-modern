@@ -1,14 +1,28 @@
 import React, { Suspense, useState } from 'react';
 import { Alert, Button, Card, Col, Row, Space, Tag, Typography, message } from 'antd';
+// 直接在项目中引入远程模块
 import Comp from 'remote/Image';
 import { loadRemote, registerRemotes } from '@module-federation/modern-js-v3/runtime';
 import type { ComponentType } from 'react';
 
 const { Title, Paragraph, Text } = Typography;
 
+/**
+ * 动态运行时加载组件
+ */
 const NewRemoteCom = React.lazy(async () => {
-  const module = await loadRemote('remote/Image');
-  return module as { default: ComponentType };
+  const module = await loadRemote('remote/Button');
+  const remoteButtonModule = module as {
+    default?: ComponentType;
+    Button?: ComponentType;
+  };
+
+  const resolvedComponent = remoteButtonModule.default ?? remoteButtonModule.Button;
+  if (!resolvedComponent) {
+    throw new Error('remote/Button 未导出 default 或 Button 组件');
+  }
+
+  return { default: resolvedComponent };
 });
 
 const Index = () => {
@@ -26,7 +40,6 @@ const Index = () => {
     );
 
     setShowComponent(true);
-    message.success('已触发 remote 运行时替换');
   };
 
   return (
@@ -47,13 +60,6 @@ const Index = () => {
         <Col xs={24} xl={12}>
           <Card className="integration-card" title="宿主控制面板">
             <Space direction="vertical" size={12}>
-              <Button
-                type="primary"
-                id="remote-local-button"
-                onClick={() => message.info('[Remote Page] Host interactive works')}
-              >
-                验证宿主交互
-              </Button>
               <Button id="remote-replace-button" onClick={replaceRemote}>
                 触发远程地址替换
               </Button>

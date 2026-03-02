@@ -31,7 +31,7 @@ p {
   padding-top: 10px;
 }
 
-main {
+.container-box main {
   flex: 1;
   display: flex;
   flex-direction: column;

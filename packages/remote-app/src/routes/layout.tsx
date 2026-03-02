@@ -54,7 +54,7 @@ export default function AppLayout() {
     '/home';
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', width: '100%' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
         <div
           style={{
@@ -84,7 +84,13 @@ export default function AppLayout() {
           <h2 style={{ margin: 0 }}>Remote 应用</h2>
         </Header>
         <Content
-          style={{ margin: '24px 16px', padding: 24, background: '#fff' }}
+          style={{
+            margin: '24px 16px',
+            padding: 24,
+            background: '#fff',
+            display: 'block',
+            minWidth: 0,
+          }}
         >
           <Outlet />
         </Content>
