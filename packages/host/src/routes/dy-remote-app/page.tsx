@@ -3,6 +3,7 @@ import { createRemoteAppComponent } from '@module-federation/modern-js-v3/react'
 import { loadRemote, registerRemotes } from '@module-federation/modern-js-v3/runtime';
 import { Button, Space, Typography } from 'antd';
 import { ComponentType, useEffect, useMemo, useState } from 'react';
+import { getHostLogoutRedirect } from '../../utils/sso';
 
 const { Paragraph } = Typography;
 
@@ -96,6 +97,7 @@ export default function Page() {
       {DynamicRemoteApp ? (
         <DynamicRemoteApp
           basename={DYNAMIC_REMOTE_BASENAME}
+          logoutRedirectUrl={getHostLogoutRedirect()}
           className="remote-app-root"
           style={{ width: '100%' }}
         />

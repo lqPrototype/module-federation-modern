@@ -116,7 +116,7 @@ bff-web
 4. 登录后回跳来源地址。
 5. Host / Remote 通过 `loadRemote('ssoUtils/client')` 获取统一认证契约。
 6. Host 右上角显示用户头像，下拉可退出，默认退出回到 Showcase。
-7. Remote 独立运行时显示用户信息和退出；被 Host 挂载时隐藏右上角用户区。
+7. Remote 独立运行时显示用户信息和退出，退出会跳转到 auth-app 并携带当前页 `redirect`，登录后返回 Remote；被 Host 挂载时隐藏右上角用户区。
 8. Showcase 未登录只显示“登录统一认证”；登录后显示“进入应用”按钮。
 
 ## BFF API（`packages/bff-web/api/lambda`）
@@ -143,8 +143,12 @@ pnpm nx run bff-web:serve
 认证与回跳相关：
 
 - `AUTH_DEFAULT_REDIRECT_URL`（auth-app 默认回跳地址）
-- `HOST_LOGOUT_REDIRECT_URL`（host 退出后的跳转地址）
-- `REMOTE_LOGOUT_REDIRECT_URL`（remote 退出后的跳转地址）
+
+`remote-app` 退出回跳地址优先通过 MF 挂载参数传入，例如：
+
+```tsx
+<RemoteAppCreate basename="/remote-app" logoutRedirectUrl="http://auth.mf.local:8081/" />
+```
 
 BFF Cookie / CORS 相关：
 

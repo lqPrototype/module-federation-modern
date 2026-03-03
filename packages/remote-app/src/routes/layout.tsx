@@ -9,6 +9,7 @@ import { Outlet, useLocation, useNavigate } from '@modern-js/runtime/router';
 import { Avatar, Dropdown, Layout, Menu, Space, Typography, message } from 'antd';
 import type { MenuProps } from 'antd';
 import { useEffect, useState } from 'react';
+import { useRemoteRuntimeConfig } from '../context/remote-runtime-config';
 import {
   ensureAuthenticated,
   getAuthContract,
@@ -26,6 +27,7 @@ export default function AppLayout() {
   const [authChecked, setAuthChecked] = useState(false);
   const [sessionUser, setSessionUser] = useState<string | null>(null);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const { logoutRedirectUrl } = useRemoteRuntimeConfig();
   const navigate = useNavigate();
   const location = useLocation();
   const hideUserActionsWhenEmbedded =
@@ -101,7 +103,7 @@ export default function AppLayout() {
       await authContract.logout();
       setAuthChecked(false);
       setSessionUser(null);
-      window.location.href = getRemoteLogoutRedirect();
+      window.location.href = getRemoteLogoutRedirect(logoutRedirectUrl);
     } catch {
       message.error('退出失败，请稍后重试。');
     } finally {

@@ -35,16 +35,6 @@ const SESSION_CACHE_MS = 3000;
 const AUTH_CONTRACT_KEY = '__MF_AUTH_CONTRACT__';
 const SSO_CLIENT_REMOTE_ID = 'ssoUtils/client';
 
-const readRuntimeEnv = (key: string) => {
-  if (typeof process === 'undefined' || !process.env) {
-    return '';
-  }
-  const value = process.env[key];
-  return typeof value === 'string' ? value : '';
-};
-
-const HOST_LOGOUT_REDIRECT_URL = readRuntimeEnv('HOST_LOGOUT_REDIRECT_URL').trim();
-
 const isMfSubDomain = (hostname: string) => hostname.endsWith(MF_DOMAIN_SUFFIX);
 
 const buildOrigin = (subdomain: string, fallbackPort: string) => {
@@ -65,7 +55,7 @@ export const getAuthOrigin = () => buildOrigin('auth', AUTH_PORT);
 
 export const getShowcaseOrigin = () => buildOrigin('showcase', SHOWCASE_PORT);
 
-export const getHostLogoutRedirect = () => HOST_LOGOUT_REDIRECT_URL || `${getShowcaseOrigin()}/`;
+export const getHostLogoutRedirect = () => `${getShowcaseOrigin()}/`;
 
 export const getApiOrigin = () => buildOrigin('api', API_PORT);
 
