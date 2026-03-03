@@ -7,12 +7,6 @@ export default defineConfig({
   server: {
     port: 8080,
   },
-  tools: {
-    bundlerChain(chain) {
-      chain.resolve.set('preferAbsolute', true);
-      chain.resolve.symlinks(true);
-    },
-  },
   source: {
     transformImport: [
       {

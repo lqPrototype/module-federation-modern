@@ -3,6 +3,17 @@ const AUTH_PORT = '8081';
 const API_PORT = '4000';
 const HOST_PORT = '8080';
 const SHOWCASE_PORT = '8088';
+const CSRF_COOKIE_KEY = 'mf_csrf_token';
+
+const readRuntimeEnv = (key: string) => {
+  if (typeof process === 'undefined' || !process.env) {
+    return '';
+  }
+  const value = process.env[key];
+  return typeof value === 'string' ? value : '';
+};
+
+const DEFAULT_REDIRECT_URL = readRuntimeEnv('AUTH_DEFAULT_REDIRECT_URL').trim();
 
 const isMfSubDomain = (hostname: string) => hostname.endsWith(MF_DOMAIN_SUFFIX);
 
@@ -37,8 +48,26 @@ export const getHostOrigin = () => buildOrigin('host', HOST_PORT);
 
 export const getShowcaseOrigin = () => buildOrigin('showcase', SHOWCASE_PORT);
 
+const getDefaultRedirect = () => DEFAULT_REDIRECT_URL || getShowcaseOrigin();
+
+export const getCsrfToken = () => {
+  if (typeof document === 'undefined') {
+    return '';
+  }
+
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [rawKey, ...rest] = cookie.trim().split('=');
+    if (rawKey !== CSRF_COOKIE_KEY) {
+      continue;
+    }
+    return decodeURIComponent(rest.join('='));
+  }
+  return '';
+};
+
 export const resolveRedirectTarget = (rawRedirect: string | null) => {
-  const fallback = getShowcaseOrigin();
+  const fallback = getDefaultRedirect();
   if (!rawRedirect) {
     return fallback;
   }

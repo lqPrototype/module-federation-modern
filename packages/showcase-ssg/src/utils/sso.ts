@@ -3,6 +3,7 @@ const AUTH_PORT = '8081';
 const HOST_PORT = '8080';
 const SHOWCASE_PORT = '8088';
 const API_PORT = '4000';
+const CSRF_COOKIE_KEY = 'mf_csrf_token';
 
 export type ShowcaseSession = {
   loggedIn: boolean;
@@ -56,6 +57,22 @@ export const getHostOrigin = () => buildOrigin('host', HOST_PORT);
 
 export const getShowcaseOrigin = () => buildOrigin('showcase', SHOWCASE_PORT);
 
+const readCookieValue = (cookieKey: string): string => {
+  if (typeof document === 'undefined') {
+    return '';
+  }
+
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [rawKey, ...rest] = cookie.trim().split('=');
+    if (rawKey !== cookieKey) {
+      continue;
+    }
+    return decodeURIComponent(rest.join('='));
+  }
+  return '';
+};
+
 export const redirectToAuth = (redirectUrl?: string) => {
   if (typeof window === 'undefined') {
     return;
@@ -74,6 +91,9 @@ export const logout = async () => {
     const response = await fetch(`${getApiOrigin()}/api/logout`, {
       method: 'POST',
       credentials: 'include',
+      headers: {
+        'X-CSRF-Token': readCookieValue(CSRF_COOKIE_KEY),
+      },
     });
     return response.ok;
   } catch {

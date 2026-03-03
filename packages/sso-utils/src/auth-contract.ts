@@ -26,8 +26,25 @@ export type GetOrCreateSsoAuthContractOptions = {
 
 const DEFAULT_GLOBAL_KEY = '__MF_AUTH_CONTRACT__';
 const DEFAULT_SESSION_CACHE_MS = 3000;
+const CSRF_COOKIE_KEY = 'mf_csrf_token';
 
 const isBrowser = () => typeof window !== 'undefined';
+
+const readCookieValue = (cookieKey: string): string => {
+  if (!isBrowser()) {
+    return '';
+  }
+
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [rawKey, ...rest] = cookie.trim().split('=');
+    if (rawKey !== cookieKey) {
+      continue;
+    }
+    return decodeURIComponent(rest.join('='));
+  }
+  return '';
+};
 
 export const isAuthContract = (value: unknown): value is AuthContract => {
   if (!value || typeof value !== 'object') {
@@ -120,6 +137,9 @@ const createAuthContract = (options: CreateAuthContractOptions): AuthContract =>
       await fetch(`${options.getApiOrigin()}/api/logout`, {
         method: 'POST',
         credentials: 'include',
+        headers: {
+          'X-CSRF-Token': readCookieValue(CSRF_COOKIE_KEY),
+        },
       });
     } finally {
       const nextSession = { loggedIn: false };

@@ -33,7 +33,7 @@ const Index = () => {
       [
         {
           name: 'remote',
-          entry: 'http://localhost:3053/static/mf-manifest.json',
+          entry: 'http://localhost:3053/mf-manifest.json',
         },
       ],
       { force: true }

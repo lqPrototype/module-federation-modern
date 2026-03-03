@@ -7,7 +7,7 @@ import { ComponentType, useEffect, useMemo, useState } from 'react';
 const { Paragraph } = Typography;
 
 const DYNAMIC_REMOTE_NAME = 'dy-remote-app';
-const DYNAMIC_REMOTE_ENTRY = 'http://localhost:3053/static/mf-manifest.json';
+const DYNAMIC_REMOTE_ENTRY = 'http://localhost:3053/mf-manifest.json';
 const DYNAMIC_REMOTE_STORAGE_KEY = 'mf:dy-remote-app:loaded';
 const DYNAMIC_REMOTE_BASENAME = '/dy-remote-app';
 

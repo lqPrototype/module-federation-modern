@@ -1,6 +1,11 @@
 import { Alert, Button, Card, ConfigProvider, Form, Input, Space, Tag } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
-import { getApiOrigin, getShowcaseOrigin, resolveRedirectTarget } from '../utils/sso';
+import {
+  getApiOrigin,
+  getCsrfToken,
+  getShowcaseOrigin,
+  resolveRedirectTarget,
+} from '../utils/sso';
 import './index.css';
 
 type SessionResponse = {
@@ -64,6 +69,7 @@ export default function Page() {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': getCsrfToken(),
         },
         body: JSON.stringify(values),
       });

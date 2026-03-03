@@ -17,8 +17,8 @@ import { getInstance } from '@module-federation/modern-js-v3/runtime';
 import {
   ensureAuthenticated,
   getAuthContract,
+  getHostLogoutRedirect,
   getSessionUser,
-  getShowcaseOrigin,
 } from '../utils/sso';
 import 'antd/dist/antd.css';
 import './index.css';
@@ -120,7 +120,7 @@ const App: React.FC = () => {
       await authContract.logout();
       setAuthChecked(false);
       setSessionUser(null);
-      window.location.href = `${getShowcaseOrigin()}/`;
+      window.location.href = getHostLogoutRedirect();
     } catch {
       message.error('退出失败，请稍后重试。');
     } finally {

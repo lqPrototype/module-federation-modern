@@ -2,12 +2,10 @@ import { createModuleFederationConfig } from '@module-federation/modern-js-v3';
 
 export default createModuleFederationConfig({
   name: 'remote',
+  filename: 'static/js/remote.js',
   // dts: false,
   dev: {
     disableDynamicRemoteTypeHints: true,
-  },
-  manifest: {
-    filePath: 'static',
   },
   bridge: {
     // 启用 Bridge Router 路由能力，默认为 true
@@ -19,7 +17,7 @@ export default createModuleFederationConfig({
     './app': './src/export-app.tsx', // 导出整个应用
   },
   remotes: {
-    ssoUtils: process.env.MF_SSO_UTILS_REMOTE ?? 'ssoUtils@http://localhost:3099/static/mf-manifest.json',
+    ssoUtils: 'ssoUtils@http://localhost:3199/mf-manifest.json',
   },
   shared: {
     react: {

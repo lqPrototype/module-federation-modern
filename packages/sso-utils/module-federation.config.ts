@@ -2,9 +2,7 @@ import { createModuleFederationConfig } from '@module-federation/modern-js-v3';
 
 export default createModuleFederationConfig({
   name: 'ssoUtils',
-  manifest: {
-    filePath: 'static',
-  },
+  filename: 'static/js/ssoUtils.js',
   exposes: {
     './client': './src/client/index.ts',
   },

@@ -9,7 +9,13 @@ import { Outlet, useLocation, useNavigate } from '@modern-js/runtime/router';
 import { Avatar, Dropdown, Layout, Menu, Space, Typography, message } from 'antd';
 import type { MenuProps } from 'antd';
 import { useEffect, useState } from 'react';
-import { ensureAuthenticated, getAuthContract, getAuthOrigin, getSessionUser } from '../utils/sso';
+import {
+  ensureAuthenticated,
+  getAuthContract,
+  getHostOrigin,
+  getRemoteLogoutRedirect,
+  getSessionUser,
+} from '../utils/sso';
 import './index.css';
 
 const { Header, Sider, Content } = Layout;
@@ -22,6 +28,9 @@ export default function AppLayout() {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const hideUserActionsWhenEmbedded =
+    typeof window !== 'undefined' &&
+    (window.location.origin === getHostOrigin() || window.self !== window.top);
 
   useEffect(() => {
     let active = true;
@@ -92,7 +101,7 @@ export default function AppLayout() {
       await authContract.logout();
       setAuthChecked(false);
       setSessionUser(null);
-      window.location.href = `${getAuthOrigin()}/`;
+      window.location.href = getRemoteLogoutRedirect();
     } catch {
       message.error('退出失败，请稍后重试。');
     } finally {
@@ -175,19 +184,21 @@ export default function AppLayout() {
           }}
         >
           <h2 style={{ margin: 0 }}>Remote 应用</h2>
-          <Dropdown
-            menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
-            trigger={['click']}
-          >
-            <div style={{ cursor: logoutLoading ? 'not-allowed' : 'pointer' }}>
-              <Space size={8}>
-                <Text>{sessionUser || '当前用户'}</Text>
-                <Avatar style={{ backgroundColor: '#1f3d96', opacity: logoutLoading ? 0.65 : 1 }}>
-                  {avatarText}
-                </Avatar>
-              </Space>
-            </div>
-          </Dropdown>
+          {!hideUserActionsWhenEmbedded ? (
+            <Dropdown
+              menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
+              trigger={['click']}
+            >
+              <div style={{ cursor: logoutLoading ? 'not-allowed' : 'pointer' }}>
+                <Space size={8}>
+                  <Text>{sessionUser || '当前用户'}</Text>
+                  <Avatar style={{ backgroundColor: '#1f3d96', opacity: logoutLoading ? 0.65 : 1 }}>
+                    {avatarText}
+                  </Avatar>
+                </Space>
+              </div>
+            </Dropdown>
+          ) : null}
         </Header>
         <Content
           style={{
