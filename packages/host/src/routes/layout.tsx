@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet, useLocation, useNavigate } from '@modern-js/runtime/router';
 import {
   Avatar,
-  Badge,
   Dropdown,
   Input,
   Layout,
@@ -15,7 +14,12 @@ import {
 import type { MenuProps } from 'antd';
 import { lazyLoadComponentPlugin } from '@module-federation/modern-js-v3/react';
 import { getInstance } from '@module-federation/modern-js-v3/runtime';
-import { ensureAuthenticated, getAuthContract } from '../utils/sso';
+import {
+  ensureAuthenticated,
+  getAuthContract,
+  getSessionUser,
+  getShowcaseOrigin,
+} from '../utils/sso';
 import 'antd/dist/antd.css';
 import './index.css';
 
@@ -49,10 +53,18 @@ const App: React.FC = () => {
   const { pathname } = useLocation();
   const [authChecked, setAuthChecked] = React.useState(false);
   const [logoutLoading, setLogoutLoading] = React.useState(false);
+  const [sessionUser, setSessionUser] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let active = true;
     let unsubscribe: (() => void) | null = null;
+
+    const syncSessionUser = async () => {
+      const user = await getSessionUser();
+      if (active) {
+        setSessionUser(user);
+      }
+    };
 
     const init = async () => {
       const authContract = await getAuthContract();
@@ -65,11 +77,19 @@ const App: React.FC = () => {
           return;
         }
         setAuthChecked(session.loggedIn);
+        if (session.loggedIn) {
+          void syncSessionUser();
+        } else {
+          setSessionUser(null);
+        }
       });
 
       const loggedIn = await ensureAuthenticated();
       if (active) {
         setAuthChecked(loggedIn);
+        if (loggedIn) {
+          await syncSessionUser();
+        }
       }
     };
 
@@ -99,13 +119,16 @@ const App: React.FC = () => {
       const authContract = await getAuthContract();
       await authContract.logout();
       setAuthChecked(false);
-      await ensureAuthenticated();
+      setSessionUser(null);
+      window.location.href = `${getShowcaseOrigin()}/`;
     } catch {
       message.error('退出失败，请稍后重试。');
     } finally {
       setLogoutLoading(false);
     }
   };
+
+  const avatarText = (sessionUser || 'OP').slice(0, 2).toUpperCase();
 
   if (!authChecked) {
     return <div className="p-6 text-slate-600">正在验证登录状态...</div>;
@@ -169,11 +192,12 @@ const App: React.FC = () => {
               trigger={['click']}
             >
               <div style={{ cursor: logoutLoading ? 'not-allowed' : 'pointer' }}>
-                <Badge count={7} size="small">
+                <Space size={8}>
+                  <Text style={{ color: '#1f2a44' }}>{sessionUser || '当前用户'}</Text>
                   <Avatar style={{ backgroundColor: '#1f3d96', opacity: logoutLoading ? 0.65 : 1 }}>
-                    OP
+                    {avatarText}
                   </Avatar>
-                </Badge>
+                </Space>
               </div>
             </Dropdown>
           </Space>

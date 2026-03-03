@@ -2,6 +2,7 @@ const MF_DOMAIN_SUFFIX = '.mf.local';
 const AUTH_PORT = '8081';
 const API_PORT = '4000';
 const HOST_PORT = '8080';
+const SHOWCASE_PORT = '8088';
 
 const isMfSubDomain = (hostname: string) => hostname.endsWith(MF_DOMAIN_SUFFIX);
 
@@ -34,8 +35,10 @@ export const getApiOrigin = () => buildOrigin('api', API_PORT);
 
 export const getHostOrigin = () => buildOrigin('host', HOST_PORT);
 
+export const getShowcaseOrigin = () => buildOrigin('showcase', SHOWCASE_PORT);
+
 export const resolveRedirectTarget = (rawRedirect: string | null) => {
-  const fallback = getHostOrigin();
+  const fallback = getShowcaseOrigin();
   if (!rawRedirect) {
     return fallback;
   }

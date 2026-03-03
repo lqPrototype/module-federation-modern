@@ -6,23 +6,33 @@ import {
   TeamOutlined,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from '@modern-js/runtime/router';
-import { Layout, Menu } from 'antd';
+import { Avatar, Dropdown, Layout, Menu, Space, Typography, message } from 'antd';
 import type { MenuProps } from 'antd';
 import { useEffect, useState } from 'react';
-import { ensureAuthenticated, getAuthContract } from '../utils/sso';
+import { ensureAuthenticated, getAuthContract, getAuthOrigin, getSessionUser } from '../utils/sso';
 import './index.css';
 
 const { Header, Sider, Content } = Layout;
+const { Text } = Typography;
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const [sessionUser, setSessionUser] = useState<string | null>(null);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     let active = true;
     let unsubscribe: (() => void) | null = null;
+
+    const syncSessionUser = async () => {
+      const user = await getSessionUser();
+      if (active) {
+        setSessionUser(user);
+      }
+    };
 
     const init = async () => {
       const authContract = await getAuthContract();
@@ -35,11 +45,19 @@ export default function AppLayout() {
           return;
         }
         setAuthChecked(session.loggedIn);
+        if (session.loggedIn) {
+          void syncSessionUser();
+        } else {
+          setSessionUser(null);
+        }
       });
 
       const loggedIn = await ensureAuthenticated();
       if (active) {
         setAuthChecked(loggedIn);
+        if (loggedIn) {
+          await syncSessionUser();
+        }
       }
     };
 
@@ -54,6 +72,35 @@ export default function AppLayout() {
   if (!authChecked) {
     return <div className="p-6 text-slate-600">正在验证登录状态...</div>;
   }
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'logout',
+      label: '退出登录',
+      danger: true,
+    },
+  ];
+
+  const handleUserMenuClick: MenuProps['onClick'] = async ({ key }) => {
+    if (key !== 'logout' || logoutLoading) {
+      return;
+    }
+
+    setLogoutLoading(true);
+    try {
+      const authContract = await getAuthContract();
+      await authContract.logout();
+      setAuthChecked(false);
+      setSessionUser(null);
+      window.location.href = `${getAuthOrigin()}/`;
+    } catch {
+      message.error('退出失败，请稍后重试。');
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
+
+  const avatarText = (sessionUser || 'OP').slice(0, 2).toUpperCase();
 
   const menuItems: MenuProps['items'] = [
     {
@@ -118,8 +165,29 @@ export default function AppLayout() {
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: '0 24px', background: '#fff' }}>
+        <Header
+          style={{
+            padding: '0 24px',
+            background: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <h2 style={{ margin: 0 }}>Remote 应用</h2>
+          <Dropdown
+            menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
+            trigger={['click']}
+          >
+            <div style={{ cursor: logoutLoading ? 'not-allowed' : 'pointer' }}>
+              <Space size={8}>
+                <Text>{sessionUser || '当前用户'}</Text>
+                <Avatar style={{ backgroundColor: '#1f3d96', opacity: logoutLoading ? 0.65 : 1 }}>
+                  {avatarText}
+                </Avatar>
+              </Space>
+            </div>
+          </Dropdown>
         </Header>
         <Content
           style={{

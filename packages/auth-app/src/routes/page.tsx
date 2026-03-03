@@ -1,6 +1,6 @@
-import { Alert, Button, Card, ConfigProvider, Form, Input, Space } from 'antd';
+import { Alert, Button, Card, ConfigProvider, Form, Input, Space, Tag } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
-import { getApiOrigin, resolveRedirectTarget } from '../utils/sso';
+import { getApiOrigin, getShowcaseOrigin, resolveRedirectTarget } from '../utils/sso';
 import './index.css';
 
 type SessionResponse = {
@@ -15,13 +15,23 @@ export default function Page() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const redirectTarget = useMemo(() => {
+  const authContext = useMemo(() => {
     if (typeof window === 'undefined') {
-      return resolveRedirectTarget(null);
+      return {
+        redirectTarget: resolveRedirectTarget(null),
+        hasExplicitRedirect: false,
+      };
     }
+
     const params = new URLSearchParams(window.location.search);
-    return resolveRedirectTarget(params.get('redirect'));
+    const rawRedirect = params.get('redirect');
+    return {
+      redirectTarget: resolveRedirectTarget(rawRedirect),
+      hasExplicitRedirect: Boolean(rawRedirect),
+    };
   }, []);
+
+  const redirectTarget = authContext.redirectTarget;
 
   useEffect(() => {
     const checkSession = async () => {
@@ -74,6 +84,10 @@ export default function Page() {
     window.location.href = redirectTarget;
   };
 
+  const handleGoShowcase = () => {
+    window.location.href = `${getShowcaseOrigin()}/`;
+  };
+
   return (
     <ConfigProvider
       theme={{
@@ -94,7 +108,12 @@ export default function Page() {
             <header className="mb-8">
               <p className="auth-kicker">ENTERPRISE ACCESS ID</p>
               <h1 className="auth-title">统一身份认证平台</h1>
-              <p className="auth-desc">使用企业账号安全登录，自动跳转到目标业务系统。</p>
+              <p className="auth-desc">统一承接 Host / Remote / Showcase 的登录与回跳。</p>
+              <Space wrap size={8} className="mt-4">
+                <Tag color="blue">Host</Tag>
+                <Tag color="geekblue">Remote</Tag>
+                <Tag color="cyan">Showcase</Tag>
+              </Space>
             </header>
 
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
@@ -107,11 +126,20 @@ export default function Page() {
                     type="success"
                     showIcon
                     message="检测到有效登录态"
-                    description="可以直接返回目标业务系统。"
+                    description={
+                      authContext.hasExplicitRedirect
+                        ? '可以直接返回来源业务页面。'
+                        : '当前未指定来源页面，可返回 Showcase 首页。'
+                    }
                   />
-                  <Button type="primary" size="large" block onClick={handleContinue}>
-                    继续进入系统
-                  </Button>
+                  <Space direction="vertical" size={10} style={{ width: '100%' }}>
+                    <Button type="primary" size="large" block onClick={handleContinue}>
+                      {authContext.hasExplicitRedirect ? '继续进入来源系统' : '进入默认首页'}
+                    </Button>
+                    <Button size="large" block onClick={handleGoShowcase}>
+                      前往 Showcase 首页
+                    </Button>
+                  </Space>
                 </Space>
               ) : null}
 
@@ -149,7 +177,7 @@ export default function Page() {
                     block
                     loading={loading}
                   >
-                    登录
+                    登录并继续
                   </Button>
                 </Form>
               ) : null}
