@@ -164,3 +164,114 @@ BFF Cookie / CORS 相关：
 - Modern.js: <https://modernjs.dev/zh/>
 - Module Federation: <https://module-federation.io/zh/>
 - Nx: <https://nx.dev/>
+
+## VS code 
+
+> 装扩展：Markdown Preview Mermaid Support
+
+```mermaid
+flowchart TB
+  subgraph Browser["浏览器（*.mf.local）"]
+    direction LR
+    Showcase["showcase-ssg :8088"]
+    Host["host :8080"]
+    Remote["remote-app :3053"]
+    Auth["auth-app :8081"]
+  end
+
+  subgraph MF["Module Federation 运行时"]
+    SsoUtils["sso-utils :3199\nexpose: ssoUtils/client"]
+    RemoteExpose["remote-app expose:\nremote/app, remote/Button, remote/Image"]
+  end
+
+  subgraph BFF["认证服务（bff-web :4000）"]
+    SessionAPI["GET /api/session"]
+    LoginAPI["POST /api/login"]
+    LogoutAPI["POST /api/logout"]
+  end
+
+  Cookie["SSO Cookie（mf_sso_token / mf_sso_user）\nDomain=.mf.local"]
+
+  %% MF 关系
+  Host -- "loadRemote('remote/app')" --> RemoteExpose
+  Host -- "loadRemote('ssoUtils/client')" --> SsoUtils
+  Remote -- "loadRemote('ssoUtils/client')" --> SsoUtils
+
+  %% SSO SDK职责
+  SsoUtils -- "getSession/requireAuth/logout" --> SessionAPI
+  SsoUtils -- "logout" --> LogoutAPI
+
+  %% 各前端与BFF
+  Showcase -- "credentials: include\nGET /api/session" --> SessionAPI
+  Auth -- "credentials: include\nPOST /api/login" --> LoginAPI
+  Host -- "credentials: include" --> SessionAPI
+  Remote -- "credentials: include" --> SessionAPI
+
+  LoginAPI -- "Set-Cookie" --> Cookie
+  LogoutAPI -- "Clear-Cookie" --> Cookie
+  SessionAPI -- "读取 Cookie" --> Cookie
+
+  %% 页面跳转
+  Showcase -- "未登录 -> /?redirect=..." --> Auth
+  Auth -- "登录后回跳 redirect" --> Showcase
+  Showcase -- "进入应用" --> Host
+
+```
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as 用户
+  participant R as remote-app(独立访问)
+  participant S as ssoUtils/client
+  participant B as bff-web
+  participant A as auth-app
+
+  U->>R: 打开 remote-app
+  R->>S: ensureAuthenticated()
+  S->>B: GET /api/session (include cookie)
+  B-->>S: loggedIn=false
+  S-->>R: 需要登录
+  R->>A: 跳转 /?redirect=当前remote地址
+
+  U->>A: 提交登录
+  A->>B: POST /api/login
+  B-->>A: Set-Cookie(mf_sso_token...)
+  A->>R: 回跳 redirect（remote-app）
+
+  U->>R: 点击“退出”
+  R->>S: logout()
+  S->>B: POST /api/logout
+  B-->>S: Clear-Cookie
+  R->>A: 跳转 /?redirect=当前remote地址
+  U->>A: 登录并继续
+  A->>R: 回到 remote-app 后台
+
+```
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as 用户
+  participant H as host(嵌入remote)
+  participant RS as remote-app(被挂载)
+  participant S as ssoUtils/client
+  participant B as bff-web
+  participant SC as showcase-ssg
+
+  U->>H: 进入 Host
+  H->>S: ensureAuthenticated()
+  S->>B: GET /api/session
+  B-->>S: loggedIn=true
+  S-->>H: 通过
+
+  H->>RS: loadRemote('remote/app')
+  Note over RS: 被 Host 挂载时隐藏子应用右上角用户区
+
+  U->>H: 点击 Host 右上角退出
+  H->>S: logout()
+  S->>B: POST /api/logout
+  B-->>S: Clear-Cookie
+  H->>SC: 跳转 showcase 首页
+
+```
