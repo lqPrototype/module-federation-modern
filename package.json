@@ -13,8 +13,8 @@
     "prettier": "^2.6.2"
   },
   "scripts": {
-    "app-verbose": "pnpm nx run-many --target=serve --configuration=development -p host,remote-app,auth-app,showcase-ssg,bff-web --parallel=5 --output-style=stream --verbose",
-    "build": "pnpm nx run-many --target=build --configuration=development -p host,remote-app,auth-app,showcase-ssg,bff-web --parallel=5 --output-style=stream --verbose"
+    "app-verbose": "pnpm nx run-many --target=serve --configuration=development -p host,remote-app,auth-app,showcase-ssg,bff-web,sso-utils --parallel=6 --output-style=stream --verbose",
+    "build": "pnpm nx run-many --target=build --configuration=development -p host,remote-app,auth-app,showcase-ssg,bff-web,sso-utils --parallel=6 --output-style=stream --verbose"
   },
   "workspaces": [
     "packages/*"

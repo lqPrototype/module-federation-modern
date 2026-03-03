@@ -1,7 +1,13 @@
 const MF_DOMAIN_SUFFIX = '.mf.local';
 const AUTH_PORT = '8081';
 const HOST_PORT = '8080';
+const SHOWCASE_PORT = '8088';
 const API_PORT = '4000';
+
+export type ShowcaseSession = {
+  loggedIn: boolean;
+  user: string | null;
+};
 
 const isMfSubDomain = (hostname: string) => hostname.endsWith(MF_DOMAIN_SUFFIX);
 
@@ -21,9 +27,9 @@ const buildOrigin = (subdomain: string, fallbackPort: string) => {
 
 export const getApiOrigin = () => buildOrigin('api', API_PORT);
 
-export const checkSession = async () => {
+export const getSession = async (): Promise<ShowcaseSession> => {
   if (typeof window === 'undefined') {
-    return false;
+    return { loggedIn: false, user: null };
   }
 
   try {
@@ -31,13 +37,16 @@ export const checkSession = async () => {
       credentials: 'include',
     });
     if (!response.ok) {
-      return false;
+      return { loggedIn: false, user: null };
     }
 
-    const data = (await response.json()) as { loggedIn?: boolean };
-    return Boolean(data.loggedIn);
+    const data = (await response.json()) as { loggedIn?: boolean; user?: string | null };
+    return {
+      loggedIn: Boolean(data.loggedIn),
+      user: data.user ?? null,
+    };
   } catch {
-    return false;
+    return { loggedIn: false, user: null };
   }
 };
 
@@ -45,11 +54,29 @@ export const getAuthOrigin = () => buildOrigin('auth', AUTH_PORT);
 
 export const getHostOrigin = () => buildOrigin('host', HOST_PORT);
 
-export const redirectToAuth = () => {
+export const getShowcaseOrigin = () => buildOrigin('showcase', SHOWCASE_PORT);
+
+export const redirectToAuth = (redirectUrl?: string) => {
   if (typeof window === 'undefined') {
     return;
   }
 
-  const redirect = encodeURIComponent(window.location.href);
+  const redirect = encodeURIComponent(redirectUrl ?? window.location.href);
   window.location.href = `${getAuthOrigin()}/?redirect=${redirect}`;
+};
+
+export const logout = async () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${getApiOrigin()}/api/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 };

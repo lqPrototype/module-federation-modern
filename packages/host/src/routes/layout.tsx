@@ -3,18 +3,19 @@ import { Outlet, useLocation, useNavigate } from '@modern-js/runtime/router';
 import {
   Avatar,
   Badge,
-  Breadcrumb,
+  Dropdown,
   Input,
   Layout,
   Menu,
   Space,
   Tag,
   Typography,
+  message,
 } from 'antd';
 import type { MenuProps } from 'antd';
 import { lazyLoadComponentPlugin } from '@module-federation/modern-js-v3/react';
 import { getInstance } from '@module-federation/modern-js-v3/runtime';
-import { ensureAuthenticated } from '../utils/sso';
+import { ensureAuthenticated, getAuthContract } from '../utils/sso';
 import 'antd/dist/antd.css';
 import './index.css';
 
@@ -47,23 +48,64 @@ const App: React.FC = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [authChecked, setAuthChecked] = React.useState(false);
+  const [logoutLoading, setLogoutLoading] = React.useState(false);
 
   React.useEffect(() => {
     let active = true;
+    let unsubscribe: (() => void) | null = null;
 
-    const check = async () => {
+    const init = async () => {
+      const authContract = await getAuthContract();
+      if (!active) {
+        return;
+      }
+
+      unsubscribe = authContract.subscribe(session => {
+        if (!active) {
+          return;
+        }
+        setAuthChecked(session.loggedIn);
+      });
+
       const loggedIn = await ensureAuthenticated();
-      if (active && loggedIn) {
-        setAuthChecked(true);
+      if (active) {
+        setAuthChecked(loggedIn);
       }
     };
 
-    check();
+    init();
 
     return () => {
       active = false;
+      unsubscribe?.();
     };
   }, []);
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'logout',
+      label: '退出登录',
+      danger: true,
+    },
+  ];
+
+  const handleUserMenuClick: MenuProps['onClick'] = async ({ key }) => {
+    if (key !== 'logout' || logoutLoading) {
+      return;
+    }
+
+    setLogoutLoading(true);
+    try {
+      const authContract = await getAuthContract();
+      await authContract.logout();
+      setAuthChecked(false);
+      await ensureAuthenticated();
+    } catch {
+      message.error('退出失败，请稍后重试。');
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
 
   if (!authChecked) {
     return <div className="p-6 text-slate-600">正在验证登录状态...</div>;
@@ -122,9 +164,18 @@ const App: React.FC = () => {
               placeholder="搜索路由、模块、组件..."
               allowClear
             />
-            <Badge count={7} size="small">
-              <Avatar style={{ backgroundColor: '#1f3d96' }}>OP</Avatar>
-            </Badge>
+            <Dropdown
+              menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
+              trigger={['click']}
+            >
+              <div style={{ cursor: logoutLoading ? 'not-allowed' : 'pointer' }}>
+                <Badge count={7} size="small">
+                  <Avatar style={{ backgroundColor: '#1f3d96', opacity: logoutLoading ? 0.65 : 1 }}>
+                    OP
+                  </Avatar>
+                </Badge>
+              </div>
+            </Dropdown>
           </Space>
         </Header>
 

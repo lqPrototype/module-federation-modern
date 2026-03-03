@@ -18,6 +18,9 @@ export default createModuleFederationConfig({
     './Button': './src/components/Button.tsx',
     './app': './src/export-app.tsx', // 导出整个应用
   },
+  remotes: {
+    ssoUtils: process.env.MF_SSO_UTILS_REMOTE ?? 'ssoUtils@http://localhost:3099/static/mf-manifest.json',
+  },
   shared: {
     react: {
       singleton: true,

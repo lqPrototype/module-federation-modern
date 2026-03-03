@@ -9,7 +9,7 @@ import { Outlet, useLocation, useNavigate } from '@modern-js/runtime/router';
 import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
 import { useEffect, useState } from 'react';
-import { ensureAuthenticated } from '../utils/sso';
+import { ensureAuthenticated, getAuthContract } from '../utils/sso';
 import './index.css';
 
 const { Header, Sider, Content } = Layout;
@@ -22,18 +22,32 @@ export default function AppLayout() {
 
   useEffect(() => {
     let active = true;
+    let unsubscribe: (() => void) | null = null;
 
-    const check = async () => {
+    const init = async () => {
+      const authContract = await getAuthContract();
+      if (!active) {
+        return;
+      }
+
+      unsubscribe = authContract.subscribe(session => {
+        if (!active) {
+          return;
+        }
+        setAuthChecked(session.loggedIn);
+      });
+
       const loggedIn = await ensureAuthenticated();
-      if (active && loggedIn) {
-        setAuthChecked(true);
+      if (active) {
+        setAuthChecked(loggedIn);
       }
     };
 
-    check();
+    init();
 
     return () => {
       active = false;
+      unsubscribe?.();
     };
   }, []);
 

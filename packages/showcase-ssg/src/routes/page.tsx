@@ -1,6 +1,7 @@
-import { Alert, Button, Card, ConfigProvider, Space, Tag } from 'antd';
+import { Alert, Avatar, Button, Card, ConfigProvider, Dropdown, Space, Tag, message } from 'antd';
+import type { MenuProps } from 'antd';
 import { useEffect, useState } from 'react';
-import { checkSession, getHostOrigin, redirectToAuth } from '../utils/sso';
+import { getHostOrigin, getSession, getShowcaseOrigin, logout, redirectToAuth } from '../utils/sso';
 import './index.css';
 
 const projectHighlights = [
@@ -138,20 +139,35 @@ const stackTags = [
 
 export default function Page() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [sessionUser, setSessionUser] = useState<string | null>(null);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     let active = true;
-    const fetchSession = async () => {
-      const loggedIn = await checkSession();
+    const syncSession = async () => {
+      const session = await getSession();
       if (active) {
-        setIsLoggedIn(loggedIn);
+        setIsLoggedIn(session.loggedIn);
+        setSessionUser(session.user);
       }
     };
-    fetchSession();
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncSession();
+      }
+    };
+
+    syncSession();
+    window.addEventListener('focus', syncSession);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     return () => {
       active = false;
+      window.removeEventListener('focus', syncSession);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);
 
@@ -186,12 +202,42 @@ export default function Page() {
   }, []);
 
   const handleLogin = () => {
-    redirectToAuth();
+    redirectToAuth(`${getShowcaseOrigin()}/`);
   };
 
   const handleOpenHost = () => {
     window.location.href = getHostOrigin();
   };
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'logout',
+      label: '退出登录',
+      danger: true,
+    },
+  ];
+
+  const handleUserMenuClick: MenuProps['onClick'] = async ({ key }) => {
+    if (key !== 'logout' || logoutLoading) {
+      return;
+    }
+
+    setLogoutLoading(true);
+    try {
+      const ok = await logout();
+      if (!ok) {
+        message.error('退出失败，请稍后重试。');
+        return;
+      }
+      setIsLoggedIn(false);
+      setSessionUser(null);
+      message.success('已退出登录');
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
+
+  const avatarText = (sessionUser || 'OP').slice(0, 2).toUpperCase();
 
   return (
     <ConfigProvider
@@ -230,10 +276,26 @@ export default function Page() {
             </div>
 
             <Space wrap size={10}>
-              <Button onClick={handleOpenHost}>进入主应用</Button>
-              <Button type="primary" onClick={handleLogin}>
-                {isLoggedIn ? '切换认证账号' : '登录统一认证'}
-              </Button>
+              {isLoggedIn ? (
+                <Dropdown
+                  menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
+                  trigger={['click']}
+                >
+                  <Avatar
+                    style={{
+                      backgroundColor: '#2f7dff',
+                      cursor: logoutLoading ? 'not-allowed' : 'pointer',
+                      opacity: logoutLoading ? 0.7 : 1,
+                    }}
+                  >
+                    {avatarText}
+                  </Avatar>
+                </Dropdown>
+              ) : (
+                <Button type="primary" onClick={handleLogin}>
+                  登录统一认证
+                </Button>
+              )}
             </Space>
           </div>
           <div className="showcase-scroll-progress">
@@ -266,12 +328,11 @@ export default function Page() {
                 </div>
 
                 <Space wrap size={12} className="mt-7">
-                  <Button type="primary" size="large" onClick={handleOpenHost}>
-                    打开 Host 演示
-                  </Button>
-                  <Button size="large" onClick={handleLogin}>
-                    进入统一认证
-                  </Button>
+                  {isLoggedIn ? (
+                    <Button type="primary" size="large" onClick={handleOpenHost}>
+                      进入应用
+                    </Button>
+                  ) : null}
                 </Space>
 
                 <div className="showcase-top-metrics">
